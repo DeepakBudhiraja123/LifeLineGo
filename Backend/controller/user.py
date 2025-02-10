@@ -2,16 +2,48 @@ from urllib import response
 from flask import request
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required,get_jwt
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from passlib.hash import pbkdf2_sha256
 from tables import UserModel
 from db import db
-from schemas import UserSchema
+from schemas import UserSchema, LoginSchema
+from blocklist import BLOCKLIST
 
 blp = Blueprint("Users", __name__, description="Operations on users")
 
 # Business Logic Functions
+
+def check_user_role():
+    """Check if the JWT contains the 'user' role."""
+    claims = get_jwt()
+    if claims.get("role") != "user":
+        abort(403, message="Access forbidden: User role required.")
+
+
+
+def login_user_logic(user_data):
+    """Business logic to log in a user."""
+    user = UserModel.query.filter_by(name=user_data["name"]).first()
+    if not user or not pbkdf2_sha256.verify(user_data["password"], user.password):
+        abort(401, message="Invalid username or password.")
+    
+    access_token = create_access_token(identity=str(user.id), additional_claims={"role": "user"}, fresh=True)
+    refresh_token = create_refresh_token(identity=str(user.id))
+    
+    return {
+        "message": "Login successful",
+        "access_token": access_token,
+        "refresh_token": refresh_token
+    }
+
+
+def logout_user_logic(jti):
+    """Business logic to simulate a logout (since JWTs are stateless)."""
+    # In a real-world application, you might blacklist the token here.
+    BLOCKLIST.add(jti)
+    return {"message": "Logged out successfully"}
+
 
 
 def get_all_users_logic():
@@ -63,7 +95,6 @@ def get_user_logic(user_id):
     return user
 
 
-
 def update_user_logic(user_id, user_data):
     """Business logic to update a user."""
     user = UserModel.query.get(user_id)
@@ -71,6 +102,10 @@ def update_user_logic(user_id, user_data):
         abort(404, message="User not found.")
     
     for key, value in user_data.items():
+        if key == "password":  # Check if we're updating the password
+            if len(value) < 6:
+                abort(400, message="Password must be at least 6 characters long.")
+            value = pbkdf2_sha256.hash(value)  # Hash the new password
         setattr(user, key, value)
     
     try:
@@ -80,8 +115,6 @@ def update_user_logic(user_id, user_data):
         abort(500, message="An error occurred while updating the user.")
     
     return user
-
-
 
 def delete_user_logic(user_id):
     """Business logic to delete a user."""
@@ -104,7 +137,6 @@ def delete_user_logic(user_id):
 class UserList(MethodView):
     @blp.arguments(UserSchema)
     def post(self, user_data):
-        print("I'm called")
         """Create a new user and return the created user with tokens."""
         return create_user_logic(user_data)
 
@@ -112,6 +144,7 @@ class UserList(MethodView):
     @blp.response(200, UserSchema)
     def get(self):
         """Get the current user using the token."""
+        check_user_role()  # Ensure only users can access this
         user_id = get_jwt_identity()
         return get_user_logic(user_id)
 
@@ -120,6 +153,7 @@ class UserList(MethodView):
     @blp.response(200, UserSchema)
     def put(self, user_data):
         """Replace the current user (PUT, idempotent)."""
+        check_user_role()
         user_id = get_jwt_identity()
         return update_user_logic(user_id, user_data)
 
@@ -128,6 +162,7 @@ class UserList(MethodView):
     @blp.response(200, UserSchema)
     def patch(self, user_data):
         """Update the current user (PATCH, partial update)."""
+        check_user_role()
         user_id = get_jwt_identity()
         return update_user_logic(user_id, user_data)
 
@@ -135,10 +170,10 @@ class UserList(MethodView):
     @blp.response(204)
     def delete(self):
         """Delete the current user."""
+        check_user_role()
         user_id = get_jwt_identity()
         delete_user_logic(user_id)
         return "", 204
-
 
 @blp.route("/api/users/all")
 class AllUsers(MethodView):
@@ -149,3 +184,22 @@ class AllUsers(MethodView):
         if not users:
             abort(404, message="No users found.")
         return users
+
+
+
+@blp.route("/api/users/login")
+class UserLogin(MethodView):
+    @blp.arguments(LoginSchema)
+    def post(self, user_data):
+        """Log in a user and return access and refresh tokens."""
+        return login_user_logic(user_data)
+
+
+@blp.route("/api/users/logout")
+class UserLogout(MethodView):
+    @jwt_required()
+    def post(self):
+        """Log out the current user."""
+        check_user_role()
+        jti = get_jwt()["jti"]
+        return logout_user_logic(jti)

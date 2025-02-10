@@ -3,6 +3,8 @@ from flask_smorest import Api
 from flask_jwt_extended import JWTManager
 from db import db  # Ensure db is the same instance used in your models
 from controller.user import blp as UserBlp
+from controller.admin import blp as AdminBlp
+from controller.hospital import blp as HospitalBlp
 from tables import *  # Make sure tables use db from db.py
 from blocklist import BLOCKLIST
 
@@ -68,6 +70,8 @@ def home():
 # Register Blueprints
 api = Api(app)
 api.register_blueprint(UserBlp)
+api.register_blueprint(AdminBlp)
+api.register_blueprint(HospitalBlp)
 
 if __name__ == "__main__":
     app.run()
