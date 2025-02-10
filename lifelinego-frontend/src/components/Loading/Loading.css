@@ -1,0 +1,35 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full-screen height */
+  background: linear-gradient(to bottom, white, rgb(234, 132, 132));
+}
+
+.rotating-border {
+  width: 150px; /* Adjust size */
+  height: 150px;
+  border: 8px solid transparent;
+  border-top: 8px solid red;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  animation: rotate 3s ease-in-out infinite;
+}
+
+.ambulance-image {
+  width: 100px; /* Adjust size */
+  height: auto;
+  position: absolute; /* Keep image fixed inside the rotating border */
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
