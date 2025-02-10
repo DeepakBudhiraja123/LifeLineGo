@@ -8,7 +8,7 @@ from passlib.hash import pbkdf2_sha256
 from tables import UserModel
 from db import db
 from schemas import UserSchema, LoginSchema
-from blocklist import BLOCKLIST
+from services.logout import logout_logic
 
 blp = Blueprint("Users", __name__, description="Operations on users")
 
@@ -200,6 +200,6 @@ class UserLogout(MethodView):
     @jwt_required()
     def post(self):
         """Log out the current user."""
-        check_user_role()
         jti = get_jwt()["jti"]
-        return logout_user_logic(jti)
+        exp = get_jwt()["exp"]  # Token expiration timestamp
+        return logout_logic(jti, exp)

@@ -37,9 +37,10 @@ class PlainDriverSchema(Schema):
     
 class PlainAmbulanceSchema(Schema):
     id = fields.Int(dump_only=True)
-    license_plate = fields.Str(required=True)
+    vehicle_number = fields.Str(required=True)
     vehicle_type = fields.Str(required=True)  # e.g., "basic", "advanced"
-    status = fields.Str(required=True)  # e.g., "available", "on duty", "maintenance"
+    status = fields.Str(required=False, allow_none=True,dump_only=True)  # e.g., "available", "on duty", "maintenance"
+    driver_id = fields.Int(load_only=True,required=False, allow_none=True) 
     
 class PlainBookingSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -74,8 +75,9 @@ class DriverSchema(PlainDriverSchema):
 
 
 class AmbulanceSchema(PlainAmbulanceSchema):
-    hospital = fields.Nested(HospitalSchema, dump_only=True)
-
+    hospital = fields.Nested(PlainHospitalSchema, dump_only=True)
+    driver = fields.Nested(PlainDriverSchema, dump_only=True)
+    
 
 
 

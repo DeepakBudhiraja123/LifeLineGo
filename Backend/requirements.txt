@@ -6,3 +6,6 @@ flask-sqlalchemy
 email_validator
 passlib
 flask-jwt-extended
+pymysql
+apscheduler
+flask-restful

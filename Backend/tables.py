@@ -2,6 +2,13 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from db import db
 
+# Association table for many-to-many relationship between hospitals and drivers
+hospital_driver_association = db.Table(
+    "hospital_driver",
+    db.Column("hospital_id", db.Integer, db.ForeignKey("hospitals.id"), primary_key=True),
+    db.Column("driver_id", db.Integer, db.ForeignKey("drivers.id"), primary_key=True)
+)
+
 # Address Model
 class AddressModel(db.Model):
     __tablename__ = "addresses"
@@ -26,7 +33,7 @@ class AdminModel(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    phone = db.Column(db.String(15), unique=True,nullable=False)
+    phone = db.Column(db.String(15), unique=True, nullable=False)
 
     # Relationship
     hospitals = db.relationship("HospitalModel", back_populates="admin")
@@ -39,7 +46,7 @@ class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    phone = db.Column(db.String(15),unique=True, nullable=False)
+    phone = db.Column(db.String(15), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -68,6 +75,7 @@ class HospitalModel(db.Model):
     ambulances = db.relationship("AmbulanceModel", back_populates="hospital")
     address = db.relationship("AddressModel", back_populates="hospitals")
     bookings = db.relationship("BookingModel", back_populates="hospital")
+    drivers = db.relationship("DriverModel", secondary=hospital_driver_association, back_populates="hospitals")
 
 
 # Driver Model
@@ -77,14 +85,16 @@ class DriverModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    phone = db.Column(db.String(15),unique=True, nullable=False)
+    phone = db.Column(db.String(15), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Foreign key
     address_id = db.Column(db.Integer, db.ForeignKey("addresses.id"), nullable=False)
 
-    # Relationship
+    # Relationships
     address = db.relationship("AddressModel", back_populates="drivers")
+    hospitals = db.relationship("HospitalModel", secondary=hospital_driver_association, back_populates="drivers")
+    ambulances = db.relationship("AmbulanceModel", back_populates="driver")
 
 
 # Ambulance Model
@@ -94,14 +104,17 @@ class AmbulanceModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     vehicle_number = db.Column(db.String(20), unique=True, nullable=False)
     vehicle_type = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.String(50), nullable=False, default="available")  # e.g., available, busy, maintenance
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Foreign key
+    # Foreign keys
     hospital_id = db.Column(db.Integer, db.ForeignKey("hospitals.id"), nullable=False)
+    driver_id = db.Column(db.Integer, db.ForeignKey("drivers.id"), nullable=True)  # Assigned driver
 
-    # Relationship
+    # Relationships
     hospital = db.relationship("HospitalModel", back_populates="ambulances")
-
+    driver = db.relationship("DriverModel", back_populates="ambulances")
+    bookings = db.relationship("BookingModel", back_populates="ambulance")  # Relationship to check bookings
 
 # Booking Model
 class BookingModel(db.Model):
@@ -109,7 +122,7 @@ class BookingModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     patient_name = db.Column(db.String(100), nullable=False)
-    patient_contact = db.Column(db.String(15),unique=True, nullable=False)
+    patient_contact = db.Column(db.String(15), unique=True, nullable=False)
     status = db.Column(db.String(50), nullable=False, default="pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -122,8 +135,16 @@ class BookingModel(db.Model):
 
     # Relationships
     user = db.relationship("UserModel", back_populates="bookings")
-    hospital = db.relationship("HospitalModel",back_populates="bookings")
-    ambulance = db.relationship("AmbulanceModel")
+    hospital = db.relationship("HospitalModel", back_populates="bookings")
+    ambulance = db.relationship("AmbulanceModel",back_populates="bookings")
     pickup_address = db.relationship("AddressModel", foreign_keys=[pickup_address_id])
     destination_address = db.relationship("AddressModel", foreign_keys=[destination_address_id])
 
+
+class TokenBlocklist(db.Model):
+    __tablename__ = "token_blocklist"
+
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(36), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)

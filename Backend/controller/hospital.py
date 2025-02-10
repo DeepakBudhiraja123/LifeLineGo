@@ -12,7 +12,7 @@ from passlib.hash import pbkdf2_sha256
 from tables import HospitalModel
 from db import db
 from schemas import HospitalSchema, LoginSchema
-from blocklist import BLOCKLIST
+from services.logout import logout_logic
 
 blp = Blueprint("Hospitals", __name__, description="Operations on hospitals")
 
@@ -24,6 +24,13 @@ def check_hospital_role():
     claims = get_jwt()
     if claims.get("role") != "hospital":
         abort(403, message="Access forbidden: Hospital role required.")
+
+
+def get_all_hospitals_logic():
+    """Fetch all hospitals from the database."""
+    hospitals = HospitalModel.query.all()
+    hospital_schema = HospitalSchema(many=True)  # Serialize a list of users
+    return hospital_schema.dump(hospitals)
 
 
 def update_hospital_logic(hospital_id, hospital_data, partial=False):
@@ -107,6 +114,17 @@ class HospitalList(MethodView):
         return "", 204
 
 
+@blp.route("/api/hospitals/all")
+class AllUsers(MethodView):
+    @blp.response(200, HospitalSchema(many=True))
+    def get(self):
+        """Get all hospitals without any authentication."""
+        hospitals = get_all_hospitals_logic()
+        if not hospitals:
+            abort(404, message="No hospitals found.")
+        return hospitals
+
+
 @blp.route("/api/hospitals/login")
 class HospitalLogin(MethodView):
     @blp.arguments(LoginSchema)
@@ -130,9 +148,9 @@ class HospitalLogin(MethodView):
 
 @blp.route("/api/hospitals/logout")
 class HospitalLogout(MethodView):
-    @jwt_required()
-    def post(self):
-        """Log out the current hospital."""
-        jti = get_jwt()["jti"]
-        BLOCKLIST.add(jti)
-        return {"message": "Logged out successfully"}
+  @jwt_required()
+  def post(self):
+      """Log out the current hospital."""
+      jti = get_jwt()["jti"]
+      exp = get_jwt()["exp"]  # Token expiration timestamp
+      return logout_logic(jti, exp)

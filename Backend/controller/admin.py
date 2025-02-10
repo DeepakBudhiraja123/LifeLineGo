@@ -7,7 +7,7 @@ from passlib.hash import pbkdf2_sha256
 from tables import AdminModel, HospitalModel, AddressModel
 from db import db
 from schemas import AdminSchema, LoginSchema, HospitalSchema
-from blocklist import BLOCKLIST
+from services.logout import logout_logic
 
 blp = Blueprint("Admins", __name__, description="Operations on admins")
 
@@ -151,18 +151,10 @@ def update_admin_logic(admin_id, admin_data):
     
     return admin
 
+
 def delete_admin_logic(admin_id):
     """Business logic to delete an admin."""
-    admin = AdminModel.query.get(admin_id)
-    if not admin:
-        abort(404, message="Admin not found.")
-    
-    try:
-        db.session.delete(admin)
-        db.session.commit()
-    except SQLAlchemyError:
-        db.session.rollback()
-        abort(500, message="An error occurred while deleting the admin.")
+    abort(403, message="Admin cannot be deleted.")
 
 # API Routes
 @blp.route("/api/admins")
@@ -238,8 +230,9 @@ class AdminLogin(MethodView):
 
 @blp.route("/api/admins/logout")
 class AdminLogout(MethodView):
-    @jwt_required()
-    def post(self):
-        """Log out the current admin."""
-        jti = get_jwt()["jti"]
-        return logout_admin_logic(jti)
+  @jwt_required()
+  def post(self):
+    """Log out the current admin."""
+    jti = get_jwt()["jti"]
+    exp = get_jwt()["exp"]  # Token expiration timestamp
+    return logout_logic(jti, exp)
