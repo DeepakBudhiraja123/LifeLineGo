@@ -48,7 +48,7 @@
   transform: scale(1.05);
 }
 
-.emergency-btn {
+.sign-btn {
   background: #ff4444;
   color: white;
   padding: 10px 15px;
@@ -58,7 +58,7 @@
   transition: 0.3s ease;
 }
 
-.emergency-btn:hover {
+.sign-btn:hover {
   background: #d90000;
   transform: scale(1.05);
 }

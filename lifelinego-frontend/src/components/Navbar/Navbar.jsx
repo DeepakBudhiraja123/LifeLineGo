@@ -34,13 +34,13 @@ const Navbar = () => {
           </li>
           <li>
             <Link to="/contact" onClick={() => setIsOpen(false)}>
-              <PhoneCall size={18} /> Contact
+              <PhoneCall size={18} /> Call-us
             </Link>
           </li>
         </ul>
 
-        <Link to="/emergency" className="emergency-btn">
-          🚨 Emergency Call
+        <Link to="/signin" className="sign-btn">
+          Sign In
         </Link>
       </div>
     </nav>

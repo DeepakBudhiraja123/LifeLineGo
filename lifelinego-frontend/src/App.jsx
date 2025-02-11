@@ -7,6 +7,7 @@ import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
 import Navbar from "./components/Navbar/Navbar";
+import Signin from "./pages/Signin/Signin";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -33,6 +34,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/signin" element={<Signin/>}/>
             </Routes>
           </Router>
         </div>
