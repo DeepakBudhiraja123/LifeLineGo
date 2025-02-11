@@ -2,6 +2,9 @@ from flask import Flask, jsonify
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
 
+import os
+from dotenv import load_dotenv
+
 from db import db  # Ensure db is the same instance used in your models
 
 from controller.user import blp as UserBlp
@@ -22,9 +25,9 @@ app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config["API_TITLE"] = "LifeLineGo API"
 app.config["API_VERSION"] = "v1"
 app.config["OPENAPI_VERSION"] = "3.0.3"
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://sql12762048:naeghYZXK8@sql12.freesqldatabase.com:3306/sql12762048"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = "3e7fa6f5a6ba9143faca1463"
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["DEBUG"] = True
 
 # Initialize SQLAlchemy
@@ -37,7 +40,7 @@ with app.app_context():
 
 
 # Initialize JWT
-app.config['JWT_SECRET_KEY'] = "283762210800390904068900059553747386636"
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 jwt = JWTManager(app)
 
 @jwt.additional_claims_loader
