@@ -29,11 +29,12 @@ class PlainDriverSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     email = fields.Email(required=True)
-    phone_number = fields.Str(required=True)
-    address = fields.Str(required=True)
+    phone = fields.Str(required=True)
+    location = fields.Str(required=True,load_only=True)
     latitude = fields.Float(required=True)
     longitude = fields.Float(required=True)
-    status = fields.Str(required=True)  # e.g., "active", "inactive"
+    status = fields.Str(required=False, allow_none=True,dump_only=True)  # e.g., "available", "on duty", "maintenance"
+    password = fields.Str(load_only=True, required=True)
     
 class PlainAmbulanceSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -70,14 +71,15 @@ class HospitalSchema(PlainHospitalSchema):
 
 
 class DriverSchema(PlainDriverSchema):
-    hospital = fields.Nested(HospitalSchema, dump_only=True)
-
-
+    hospitals = fields.List(fields.Nested(lambda: PlainHospitalSchema()), dump_only=True)
+    ambulance = fields.Nested(PlainAmbulanceSchema(), dump_only=True)
+    bookings = fields.List(fields.Nested(lambda: PlainBookingSchema()), dump_only=True)
+    address = fields.Nested(PlainAddressSchema, required=True,dump_only=True)  # Full address details
 
 class AmbulanceSchema(PlainAmbulanceSchema):
     hospital = fields.Nested(PlainHospitalSchema, dump_only=True)
     driver = fields.Nested(PlainDriverSchema, dump_only=True)
-    
+    bookings = fields.List(fields.Nested(lambda: PlainBookingSchema()), dump_only=True)
 
 
 

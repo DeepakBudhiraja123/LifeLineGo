@@ -13,6 +13,7 @@ from tables import HospitalModel
 from db import db
 from schemas import HospitalSchema, LoginSchema
 from services.logout import logout_logic
+from services.hospital import *
 
 blp = Blueprint("Hospitals", __name__, description="Operations on hospitals")
 
@@ -26,51 +27,6 @@ def check_hospital_role():
         abort(403, message="Access forbidden: Hospital role required.")
 
 
-def get_all_hospitals_logic():
-    """Fetch all hospitals from the database."""
-    hospitals = HospitalModel.query.all()
-    hospital_schema = HospitalSchema(many=True)  # Serialize a list of users
-    return hospital_schema.dump(hospitals)
-
-
-def update_hospital_logic(hospital_id, hospital_data, partial=False):
-    """Update hospital details (partial or full update)."""
-    hospital = HospitalModel.query.get(hospital_id)
-    if not hospital:
-        abort(404, message="Hospital not found.")
-    
-    for key, value in hospital_data.items():
-        if key == "admin_password":  # Hash the new password if it's being updated
-            if len(value) < 6:
-                abort(400, message="Password must be at least 6 characters long.")
-            value = pbkdf2_sha256.hash(value)
-        setattr(hospital, key, value)
-    
-    try:
-        db.session.commit()
-    except SQLAlchemyError:
-        db.session.rollback()
-        abort(500, message="An error occurred while updating the hospital.")
-    
-    return hospital
-
-
-def delete_hospital_logic(hospital_id):
-    """Delete a hospital from the database."""
-    hospital = HospitalModel.query.get(hospital_id)
-    if not hospital:
-        abort(404, message="Hospital not found.")
-    
-    try:
-        db.session.delete(hospital)
-        db.session.commit()
-    except SQLAlchemyError:
-        db.session.rollback()
-        abort(500, message="An error occurred while deleting the hospital.")
-    
-    return {"message": "Hospital deleted successfully"}
-
-
 # API Routes
 @blp.route("/api/hospitals")
 class HospitalList(MethodView):
@@ -81,10 +37,7 @@ class HospitalList(MethodView):
         """Get the current hospital using the token."""
         check_hospital_role()
         hospital_id = get_jwt_identity()
-        hospital = HospitalModel.query.get(hospital_id)
-        if not hospital:
-            abort(404, message="Hospital not found.")
-        return hospital
+        return get_hospital_by_id(hospital_id)
 
     @jwt_required()
     @blp.arguments(HospitalSchema)
@@ -119,10 +72,7 @@ class AllUsers(MethodView):
     @blp.response(200, HospitalSchema(many=True))
     def get(self):
         """Get all hospitals without any authentication."""
-        hospitals = get_all_hospitals_logic()
-        if not hospitals:
-            abort(404, message="No hospitals found.")
-        return hospitals
+        return get_all_hospitals_logic()
 
 
 @blp.route("/api/hospitals/login")
@@ -130,20 +80,7 @@ class HospitalLogin(MethodView):
     @blp.arguments(LoginSchema)
     def post(self, login_data):
         """Log in a hospital and return access and refresh tokens."""
-        model = HospitalModel
-        hospital = model.query.filter_by(name=login_data["name"]).first()
-        
-        if not hospital or not pbkdf2_sha256.verify(login_data["password"], hospital.password):
-            abort(401, message="Invalid email or password.")
-        
-        access_token = create_access_token(identity=str(hospital.id), additional_claims={"role": "hospital"}, fresh=True)
-        refresh_token = create_refresh_token(identity=str(hospital.id),additional_claims={"role": "hospital"})
-        
-        return {
-            "message": "Login successful",
-            "access_token": access_token,
-            "refresh_token": refresh_token
-        }
+        return login_hospital_logic
 
 
 @blp.route("/api/hospitals/logout")

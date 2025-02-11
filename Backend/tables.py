@@ -83,9 +83,11 @@ class DriverModel(db.Model):
     __tablename__ = "drivers"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100),unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     phone = db.Column(db.String(15), unique=True, nullable=False)
+    status = db.Column(db.String(50), nullable=False, default="available") 
+    password = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Foreign key
@@ -94,7 +96,7 @@ class DriverModel(db.Model):
     # Relationships
     address = db.relationship("AddressModel", back_populates="drivers")
     hospitals = db.relationship("HospitalModel", secondary=hospital_driver_association, back_populates="drivers")
-    ambulances = db.relationship("AmbulanceModel", back_populates="driver")
+    ambulance = db.relationship("AmbulanceModel", back_populates="driver", uselist=False)  # One-to-one relationship with AmbulanceModel
 
 
 # Ambulance Model
@@ -113,8 +115,7 @@ class AmbulanceModel(db.Model):
 
     # Relationships
     hospital = db.relationship("HospitalModel", back_populates="ambulances")
-    driver = db.relationship("DriverModel", back_populates="ambulances")
-    bookings = db.relationship("BookingModel", back_populates="ambulance")  # Relationship to check bookings
+    driver = db.relationship("DriverModel", back_populates="ambulance", uselist=False)  # One-to-one relationship
 
 # Booking Model
 class BookingModel(db.Model):
@@ -132,13 +133,15 @@ class BookingModel(db.Model):
     ambulance_id = db.Column(db.Integer, db.ForeignKey("ambulances.id"), nullable=True)
     pickup_address_id = db.Column(db.Integer, db.ForeignKey("addresses.id"), nullable=False)
     destination_address_id = db.Column(db.Integer, db.ForeignKey("addresses.id"), nullable=False)
+    driver_id = db.Column(db.Integer, db.ForeignKey("drivers.id"), nullable=True)
 
     # Relationships
     user = db.relationship("UserModel", back_populates="bookings")
     hospital = db.relationship("HospitalModel", back_populates="bookings")
-    ambulance = db.relationship("AmbulanceModel",back_populates="bookings")
+    ambulance = db.relationship("AmbulanceModel",backref="bookings")
     pickup_address = db.relationship("AddressModel", foreign_keys=[pickup_address_id])
     destination_address = db.relationship("AddressModel", foreign_keys=[destination_address_id])
+    driver = db.relationship("DriverModel", backref="bookings")  # New relationship for driver
 
 
 class TokenBlocklist(db.Model):
