@@ -1,0 +1,96 @@
+/* Auth.css */
+.auth-container {
+  display: flex;
+  height: 92.5vh;
+  transition: all 0.5s ease-in-out;
+  overflow: hidden;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(247, 244, 244);
+}
+
+.auth-left,
+.auth-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.5s ease-in-out;
+  width: 40vw;
+  height: 70vh;
+  background-color: white;
+}
+
+.auth-left img {
+  height: auto;
+  width: 30vw;
+}
+
+.auth-box {
+  background: white;
+  width: 30vw;
+  text-align: center;
+  height: 35vh;
+  transition: transform 0.5s ease-in-out;
+}
+
+.auth-box h2 {
+  margin-bottom: 2rem;
+  font-weight: 800;
+  font-size: 35px;
+  color: #0a74da;
+}
+
+.auth-box input {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.auth-box button {
+  width: 80%;
+  padding: 10px;
+  margin-top: 20px;
+  background: #0a74da;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.auth-box button:hover {
+  background: #0a74da;
+}
+
+.auth-box p {
+  margin-top: 1rem;
+}
+
+.auth-box span {
+  color: #0a74da;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.auth-box span:hover {
+  text-decoration: underline;
+}
+
+.signin-mode .auth-left {
+  transform: translateX(0);
+}
+
+.signin-mode .auth-right {
+  transform: translateX(0);
+}
+
+.signup-mode .auth-left {
+  transform: translateX(100%);
+}
+
+.signup-mode .auth-right {
+  transform: translateX(-100%);
+}
