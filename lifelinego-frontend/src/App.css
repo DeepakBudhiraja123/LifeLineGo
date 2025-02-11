@@ -1,3 +1,8 @@
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
 .app-content {
   opacity: 0;
   transform: translateY(20px); /* Moves content slightly down initially */
