@@ -10,7 +10,6 @@ from db import db  # Ensure db is the same instance used in your models
 from controller.user import blp as UserBlp
 from controller.admin import blp as AdminBlp
 from controller.hospital import blp as HospitalBlp
-from controller.ambulance import blp as AmbulanceBlp
 from controller.driver import blp as DriverBlp
 
 from tables import *  # Make sure tables use db from db.py
@@ -117,7 +116,6 @@ api = Api(app)
 api.register_blueprint(UserBlp)
 api.register_blueprint(AdminBlp)
 api.register_blueprint(HospitalBlp)
-api.register_blueprint(AmbulanceBlp)
 api.register_blueprint(DriverBlp)
 
 if __name__ == "__main__":

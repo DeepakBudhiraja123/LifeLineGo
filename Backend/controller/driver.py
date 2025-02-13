@@ -1,21 +1,24 @@
-from flask import request
+from flask import request, jsonify
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from flask_jwt_extended import (
     create_access_token, create_refresh_token, get_jwt_identity, jwt_required, get_jwt
 )
-from passlib.hash import pbkdf2_sha256
-from services.driver import *
 
+from passlib.hash import pbkdf2_sha256
+
+from services.driver import *
 from services.logout import logout_logic
-from tables import DriverModel, AddressModel
+from services.helper import *
+
+from tables import DriverModel
 from schemas import DriverSchema, LoginSchema
 from db import db
 
 blp = Blueprint("Drivers", __name__, description="Operations on drivers")
 
 def check_driver_role():
-    """Check if the JWT contains the 'driver' role."""
+    """Check if the JWT contains the 'hospital' role."""
     claims = get_jwt()
     if claims.get("role") != "driver":
         abort(403, message="Access forbidden: Driver role required.")
@@ -27,56 +30,50 @@ class DriverList(MethodView):
     @blp.arguments(DriverSchema)
     def post(self, driver_data):
       """Create a new driver and return the created driver with tokens."""
-      driver_data["address"] =driver_data.pop("location")
-      return create_driver_logic(driver_data)
+      return create_logic(driver_data, DriverModel, "driver")
 
     @jwt_required()
-    @blp.response(200, DriverSchema)
     def get(self):
         """Get the current driver's details using the token."""
         check_driver_role()
         driver_id = get_jwt_identity()
-        return get_driver_logic(driver_id)
+        return get_item_by_id_logic(driver_id, DriverModel, "driver")
       
     @jwt_required()
     @blp.arguments(DriverSchema)
-    @blp.response(200, DriverSchema)
     def put(self, driver_data):
         """Update the current driver (PUT, partial update)."""
         check_driver_role()
         driver_id = get_jwt_identity()
-        return update_driver_logic(driver_id, driver_data)
+        return update_logic(driver_id, DriverModel, driver_data, "driver")
 
     @jwt_required()
     @blp.arguments(DriverSchema(partial=True))
-    @blp.response(200, DriverSchema)
     def patch(self, driver_data):
         """Update the current driver (PATCH, partial update)."""
         check_driver_role()
         driver_id = get_jwt_identity()
-        return update_driver_logic(driver_id, driver_data)
+        return update_logic(driver_id, DriverModel, driver_data, "driver")
 
     @jwt_required()
-    @blp.response(204)
     def delete(self):
         """Delete the current driver if not in an active booking."""
         driver_id = get_jwt_identity()
         
-        delete_driver_logic(driver_id)
-        return "", 204
+        return delete_logic(driver_id, DriverModel, "driver")
 
 
 @blp.route("/api/drivers/all")
 class AllDrivers(MethodView):
   def get(self):
-    return get_all_drivers_logic()
+    return get_all_item_logic(DriverModel, "driver")
 
 @blp.route("/api/drivers/login")
 class DriverLogin(MethodView):
     @blp.arguments(LoginSchema)
     def post(self, login_data):
       """Log in a driver and return access and refresh tokens."""
-      return login_driver_logic(login_data)
+      return login_logic(login_data, DriverModel, "driver")
 
 
 @blp.route("/api/drivers/logout")
@@ -87,3 +84,12 @@ class DriverLogout(MethodView):
         jti = get_jwt()["jti"]
         exp = get_jwt()["exp"]  # Token expiration timestamp
         return logout_logic(jti, exp)
+
+
+@blp.route("/api/drivers/nearby-hospitals")
+class NearbyHospitals(MethodView):
+    @jwt_required()
+    def get(self):
+      """Get hospitals within a 75 km range of the driver’s address."""
+      driver_id = get_jwt_identity()
+      return get_nearby_hospitals("driver", DriverModel, driver_id, radius_km=75)

@@ -13,7 +13,7 @@ from tables import HospitalModel
 from db import db
 from schemas import HospitalSchema, LoginSchema
 from services.logout import logout_logic
-from services.hospital import *
+from services.helper import *
 
 blp = Blueprint("Hospitals", __name__, description="Operations on hospitals")
 
@@ -32,47 +32,46 @@ def check_hospital_role():
 class HospitalList(MethodView):
 
     @jwt_required()
-    @blp.response(200, HospitalSchema)
     def get(self):
         """Get the current hospital using the token."""
         check_hospital_role()
         hospital_id = get_jwt_identity()
-        return get_hospital_by_id(hospital_id)
+        return get_item_by_id_logic(hospital_id, HospitalModel, "hospital")
+    
+    @blp.arguments(HospitalSchema)
+    def post(self, hospital_data):
+        """Create a new hospital (Admin-only)."""
+        return create_logic(hospital_data, HospitalModel, "hospital")
 
     @jwt_required()
     @blp.arguments(HospitalSchema)
-    @blp.response(200, HospitalSchema)
     def put(self, hospital_data):
         """Fully update the current hospital."""
         check_hospital_role()
         hospital_id = get_jwt_identity()
-        return update_hospital_logic(hospital_id, hospital_data)
+        return update_logic(hospital_id, HospitalModel, hospital_data, "hospital")
 
     @jwt_required()
     @blp.arguments(HospitalSchema(partial=True))
-    @blp.response(200, HospitalSchema)
     def patch(self, hospital_data):
         """Partially update the current hospital."""
         check_hospital_role()
         hospital_id = get_jwt_identity()
-        return update_hospital_logic(hospital_id, hospital_data, partial=True)
+        return update_logic(hospital_id, HospitalModel, hospital_data, "hospital")
 
     @jwt_required()
-    @blp.response(204)
     def delete(self):
         """Delete the current hospital."""
         check_hospital_role()
         hospital_id = get_jwt_identity()
-        delete_hospital_logic(hospital_id)
-        return "", 204
+        return delete_logic(hospital_id, HospitalModel, "hospital")
 
 
 @blp.route("/api/hospitals/all")
 class AllUsers(MethodView):
-    @blp.response(200, HospitalSchema(many=True))
     def get(self):
         """Get all hospitals without any authentication."""
-        return get_all_hospitals_logic()
+        return get_all_item_logic(HospitalModel, "hospitals")
 
 
 @blp.route("/api/hospitals/login")
@@ -80,7 +79,7 @@ class HospitalLogin(MethodView):
     @blp.arguments(LoginSchema)
     def post(self, login_data):
         """Log in a hospital and return access and refresh tokens."""
-        return login_hospital_logic
+        return login_logic(login_data, HospitalModel, "hospital")
 
 
 @blp.route("/api/hospitals/logout")

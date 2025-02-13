@@ -5,28 +5,30 @@ from db import db
 # Association table for many-to-many relationship between hospitals and drivers
 hospital_driver_association = db.Table(
     "hospital_driver",
-    db.Column("hospital_id", db.Integer, db.ForeignKey("hospitals.id"), primary_key=True),
-    db.Column("driver_id", db.Integer, db.ForeignKey("drivers.id"), primary_key=True)
+    db.Column("hospital_id", db.Integer, db.ForeignKey("hospital.id"), primary_key=True),
+    db.Column("driver_id", db.Integer, db.ForeignKey("driver.id"), primary_key=True)
 )
 
-# Address Model
-class AddressModel(db.Model):
-    __tablename__ = "addresses"
-
+class CityStateModel(db.Model):
+    __tablename__ = "city_states"
     id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(200), nullable=False)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Relationships
-    hospitals = db.relationship("HospitalModel", back_populates="address")
-    drivers = db.relationship("DriverModel", back_populates="address")
+    city = db.Column(db.String(100), nullable=False)
+    state = db.Column(db.String(100), nullable=False)
+    postal_code = db.Column(db.String(20), nullable=False, unique=True)
+ 
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "city": self.city,
+            "state": self.state,
+            "postal_code": self.postal_code
+        }
 
 
 # Admin Model
 class AdminModel(db.Model):
-    __tablename__ = "admins"
+    __tablename__ = "admin"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
@@ -34,14 +36,21 @@ class AdminModel(db.Model):
     password = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     phone = db.Column(db.String(15), unique=True, nullable=False)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "phone": self.phone
+        }
 
-    # Relationship
-    hospitals = db.relationship("HospitalModel", back_populates="admin")
 
 
 # User Model (Patient)
 class UserModel(db.Model):
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
@@ -49,99 +58,178 @@ class UserModel(db.Model):
     phone = db.Column(db.String(15), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Relationship
+    
+    # Relationships
     bookings = db.relationship("BookingModel", back_populates="user")
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "phone": self.phone,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+
 
 
 # Hospital Model
 class HospitalModel(db.Model):
-    __tablename__ = "hospitals"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    city = db.Column(db.String(100), nullable=False)
-    state = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    password = db.Column(db.String(200), nullable=False)
-    
-    # Foreign keys
-    admin_id = db.Column(db.Integer, db.ForeignKey("admins.id"), nullable=False)
-    address_id = db.Column(db.Integer, db.ForeignKey("addresses.id"), nullable=False)
-
-    # Relationships
-    admin = db.relationship("AdminModel", back_populates="hospitals")
-    ambulances = db.relationship("AmbulanceModel", back_populates="hospital")
-    address = db.relationship("AddressModel", back_populates="hospitals")
-    bookings = db.relationship("BookingModel", back_populates="hospital")
-    drivers = db.relationship("DriverModel", secondary=hospital_driver_association, back_populates="hospitals")
-
-
-# Driver Model
-class DriverModel(db.Model):
-    __tablename__ = "drivers"
+    __tablename__ = "hospital"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100),unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    phone = db.Column(db.String(15), unique=True, nullable=False)
-    status = db.Column(db.String(50), nullable=False, default="available") 
-    password = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Foreign key
-    address_id = db.Column(db.Integer, db.ForeignKey("addresses.id"), nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    phone = db.Column(db.String(15), unique=True, nullable=False)
+    
+    # Inline address fields
+    street = db.Column(db.String(255))
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    
+    # Foreign key to CityStateModel
+    city_state_id = db.Column(db.Integer, db.ForeignKey('city_states.id'), nullable=False)
+    city_state = db.relationship('CityStateModel')
 
     # Relationships
-    address = db.relationship("AddressModel", back_populates="drivers")
+    ambulances = db.relationship("AmbulanceModel", backref="hospital")
+    drivers = db.relationship("DriverModel", secondary=hospital_driver_association, back_populates="hospitals")
+    bookings = db.relationship("BookingModel", back_populates="hospital")
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "phone": self.phone,
+            "address": {
+                "street": self.street,
+                "latitude": self.latitude,
+                "longitude": self.longitude,
+                "city": self.city_state.city if self.city_state else None,
+                "state": self.city_state.state if self.city_state else None,
+                "postal_code": self.city_state.postal_code if self.city_state else None
+            }
+        }
+
+
+
+# Driver Model
+class DriverModel(db.Model):
+    __tablename__ = "driver"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    status = db.Column(db.Enum("available", "busy", "off-duty", name="driver_status"), nullable=False, default="available")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Inline address fields
+    street = db.Column(db.String(255))
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    
+    # Foreign key to CityStateModel
+    city_state_id = db.Column(db.Integer, db.ForeignKey('city_states.id'), nullable=False)
+    city_state = db.relationship('CityStateModel')
+    
+    # Relationships
     hospitals = db.relationship("HospitalModel", secondary=hospital_driver_association, back_populates="drivers")
-    ambulance = db.relationship("AmbulanceModel", back_populates="driver", uselist=False)  # One-to-one relationship with AmbulanceModel
+    bookings = db.relationship("BookingModel", back_populates="driver")
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+            "phone": self.phone,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "address": {
+                "street": self.street,
+                "latitude": self.latitude,
+                "longitude": self.longitude,
+                "city": self.city_state.city if self.city_state else None,
+                "state": self.city_state.state if self.city_state else None,
+                "postal_code": self.city_state.postal_code if self.city_state else None
+            }
+        }
+
 
 
 # Ambulance Model
 class AmbulanceModel(db.Model):
-    __tablename__ = "ambulances"
+    __tablename__ = "ambulance"
 
     id = db.Column(db.Integer, primary_key=True)
     vehicle_number = db.Column(db.String(20), unique=True, nullable=False)
     vehicle_type = db.Column(db.String(50), nullable=False)
-    status = db.Column(db.String(50), nullable=False, default="available")  # e.g., available, busy, maintenance
+    status = db.Column(db.Enum("available", "busy", "maintenance", name="ambulance_status"), nullable=False, default="available")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Foreign keys
-    hospital_id = db.Column(db.Integer, db.ForeignKey("hospitals.id"), nullable=False)
-    driver_id = db.Column(db.Integer, db.ForeignKey("drivers.id"), nullable=True)  # Assigned driver
+    hospital_id = db.Column(db.Integer, db.ForeignKey("hospital.id"), nullable=False)
 
-    # Relationships
-    hospital = db.relationship("HospitalModel", back_populates="ambulances")
-    driver = db.relationship("DriverModel", back_populates="ambulance", uselist=False)  # One-to-one relationship
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "vehicle_number": self.vehicle_number,
+            "vehicle_type": self.vehicle_type,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "hospital": self.hospital.to_dict()
+        }
+
 
 # Booking Model
 class BookingModel(db.Model):
-    __tablename__ = "bookings"
+    __tablename__ = "booking"
 
     id = db.Column(db.Integer, primary_key=True)
-    patient_name = db.Column(db.String(100), nullable=False)
-    patient_contact = db.Column(db.String(15), unique=True, nullable=False)
     status = db.Column(db.String(50), nullable=False, default="pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Inline address fields
+    source_street = db.Column(db.String(255))
+    source_latitude = db.Column(db.Float)
+    source_longitude = db.Column(db.Float)
+    
+    # Foreign key to CityStateModel
+    source_city_state_id = db.Column(db.Integer, db.ForeignKey('city_states.id'), nullable=False)
+    source_city_state = db.relationship('CityStateModel')
 
     # Foreign keys
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    hospital_id = db.Column(db.Integer, db.ForeignKey("hospitals.id"), nullable=False)
-    ambulance_id = db.Column(db.Integer, db.ForeignKey("ambulances.id"), nullable=True)
-    pickup_address_id = db.Column(db.Integer, db.ForeignKey("addresses.id"), nullable=False)
-    destination_address_id = db.Column(db.Integer, db.ForeignKey("addresses.id"), nullable=False)
-    driver_id = db.Column(db.Integer, db.ForeignKey("drivers.id"), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    hospital_id = db.Column(db.Integer, db.ForeignKey("hospital.id"), nullable=False)
+    ambulance_id = db.Column(db.Integer, db.ForeignKey("ambulance.id"), nullable=True)
+    driver_id = db.Column(db.Integer, db.ForeignKey("driver.id"), nullable=True)
 
     # Relationships
     user = db.relationship("UserModel", back_populates="bookings")
     hospital = db.relationship("HospitalModel", back_populates="bookings")
-    ambulance = db.relationship("AmbulanceModel",backref="bookings")
-    pickup_address = db.relationship("AddressModel", foreign_keys=[pickup_address_id])
-    destination_address = db.relationship("AddressModel", foreign_keys=[destination_address_id])
-    driver = db.relationship("DriverModel", backref="bookings")  # New relationship for driver
+    ambulance = db.relationship("AmbulanceModel")
+    driver = db.relationship("DriverModel", back_populates="bookings", foreign_keys=[driver_id])  # New relationship for driver
+    
+    def to_dict(self):
+        return {
+            "bookingId": self.id,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "pickup_address": {
+                "street": self.source_street,
+                "latitude": self.source_latitude,
+                "longitude": self.source_longitude,
+                "city": self.source_city_state.city if self.source_city_state else None,
+                "state": self.source_city_state.state if self.source_city_state else None,
+                "postal_code": self.source_city_state.postal_code if self.source_city_state else None
+            },
+            "user": self.user.to_dict(),
+            "hospital": self.hospital.to_dict(),
+            "ambulance": self.ambulance.to_dict() if self.ambulance else None,
+            "driver": self.driver.to_dict() if self.driver else None
+        }
 
 
 class TokenBlocklist(db.Model):
@@ -151,3 +239,6 @@ class TokenBlocklist(db.Model):
     jti = db.Column(db.String(36), nullable=False, unique=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
+
+
+
