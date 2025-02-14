@@ -1,4 +1,5 @@
 from tables import  *
+from services.driver import is_driver_in_active_booking
 from db import db
 from flask_jwt_extended import (
     create_access_token,
@@ -182,45 +183,159 @@ def haversine(lat1, lon1, lat2, lon2):
 
 # Get nearby hospitals
 
-def get_nearby_hospitals(entity,Model,id, radius_km=75):
+def get_nearby_items(entity_id,item_name, radius_km=75):
     """Get a list of hospitals within the specified radius (in km) from the entity's location."""
+    model = HospitalModel if item_name == "driver" else DriverModel
+    entity = model.query.get(entity_id)
     
-    item = Model.query.get(id).first().to_dict()
-    address = item.get("address")
-    
-    if not item or not item.address:
-        abort(404, message=f"{entity.capitalize()} or {entity} address not found.")
+    item_ids = {item.id for item in entity.hospitals} if item_name == "hospital" else {item.id for item in entity.drivers}
+    entity = entity.to_dict()
+    address = entity['address']
+    entity_name = "hsopital" if item_name == "driver" else "driver"
+    if not entity or not address:
+        abort(404, message=f"{entity_name.capitalize()} or {entity_name} address not found.")
         
     entity_lat = address['latitude']
     entity_lon = address['longitude']
     
     if entity_lat is None or entity_lon is None:
-        abort(400, message=f"{entity.capitalize()}'s address must have latitude and longitude.")
-        
+        abort(400, message=f"{entity_name.capitalize()}'s address must have latitude and longitude.")
+    item_model = HospitalModel if item_name == "hospital" else DriverModel
+    nearby_items = get_items_in_range(entity_lat, entity_lon,item_model,item_name, radius_km)[0].get(f"nearby_{item_name}s")
     
+    # Add 'isConnected' flag for each hospital
+    
+    items_with_status = []
+    for data in nearby_items:
+        print(data)
+        data["isConnected"] = data[f"{item_name}"]['id'] in item_ids
+        items_with_status.append(data)
+    
+    return items_with_status
+    
+    
+
+
+def get_items_in_range(entity_lat, entity_lon, item_model,item_name,radius_km=75):
     # Convert radius to degrees (approximation for SQL filtering)
     radius_deg = radius_km / 111  # 1 degree ≈ 111 km
 
     # Filter using SQLAlchemy attributes, not Marshmallow schema
-    nearby_hospitals = (
-    db.session.query(HospitalModel)
+    nearby_items = (
+    db.session.query(item_model)
     .filter(
-        (HospitalModel.latitude >= entity_lat - radius_deg) &
-        (HospitalModel.latitude <= entity_lat + radius_deg) &
-        (HospitalModel.longitude >= entity_lon - radius_deg) &
-        (HospitalModel.longitude <= entity_lon + radius_deg)
+        (item_model.latitude >= entity_lat - radius_deg) &
+        (item_model.latitude <= entity_lat + radius_deg) &
+        (item_model.longitude >= entity_lon - radius_deg) &
+        (item_model.longitude <= entity_lon + radius_deg)
     )
     .all()
     )
 
     # Refine results using Haversine formula for more accurate filtering
     result = []
-    for hospital in nearby_hospitals:
-        distance = haversine(entity_lat, entity_lon, hospital.latitude, hospital.address.longitude)
+    for item in nearby_items:
+        distance = haversine(entity_lat, entity_lon, item.latitude, item.longitude)
         if distance <= radius_km:
             result.append({
-                "hospital": hospital.to_dict(),
+                f"{item_name}": item.to_dict(),
                 "distance_km": round(distance, 2)
             })
+    if not result:
+        return abort(404, message=f"No {item_name}s found within the specified range.")
+    return {f"nearby_{item_name}s": result, "message": f" Nearby {item_name}s fetched successfully", "status": 200}, 200
 
-    return {"nearby_hospitals": result, "message": " Nearby hospitals fetched successfully", "status": 200}, 200
+
+
+def send_connection_request(sender_type, driver_id, hospital_id):
+    """General function to send a connection request from driver or hospital."""
+    if sender_type not in ["driver", "hospital"]:
+        abort(400, message="Invalid sender type. Must be 'driver' or 'hospital'.")
+    
+    existing_request = ConnectRequestModel.query.filter_by(
+        driver_id=driver_id, hospital_id=hospital_id, status="pending"
+    ).first()
+    
+    if existing_request:
+        abort(400, message="A pending request already exists.")
+
+    new_request = ConnectRequestModel(
+        driver_id=driver_id, 
+        hospital_id=hospital_id, 
+        sender_type=sender_type
+    )
+    db.session.add(new_request)
+    db.session.commit()
+    
+    sender = "Driver" if sender_type == "driver" else "Hospital"
+    return {"message": f"{sender} connection request sent successfully.", "status": 201, }, 201
+
+def get_connection_requests(Model,item_id):
+    item = Model.query.get(item_id)
+    if not item:
+        return abort(404, message=f"{Model} not found.")
+    connection_requests = [connection_request for connection_request in item.connection_requests if connection_request.status == "pending"]
+    if not connection_requests:
+        return abort(404, message="No pending connection requests found.")
+    return {"connection_requests": [request.to_dict() for request in connection_requests], "message": "Connection requests fetched successfully", "status": 200}, 200
+
+
+def respond_to_connection_request(connection_request, response_status):
+    """
+    Respond to a connection request (accept or reject).
+    
+    Parameters:
+    - request_id: The ID of the connection request.
+    - response_status: 'accepted' or 'rejected'
+    
+    Returns:
+    - A success message or an error if the request is not found or already responded to.
+    """
+    if response_status not in ["accepted", "rejected"]:
+        abort(400, message="Invalid response status. Must be 'accepted' or 'rejected'.")
+    
+    if connection_request.status != "pending":
+        abort(400, message="Connection request has already been responded to.")
+    
+    # Update the status
+    connection_request.status = response_status
+    if response_status == "accepted":
+        driver = DriverModel.query.get(connection_request.driver_id)
+        hospital = HospitalModel.query.get(connection_request.hospital_id)
+        driver.hospitals.append(hospital)
+    db.session.commit()
+    
+    return {"message": f"Connection request {response_status} successfully." , "status": 200}, 200
+
+
+def remove_connection(hospital_id=None, driver_id=None):
+    """
+    Remove an existing connection between a hospital and a driver.
+    
+    Parameters:
+    - hospital_id: ID of the hospital.
+    - driver_id: ID of the driver.
+    
+    Returns:
+    - A success message or an error if no connection exists.
+    """
+    if not hospital_id or not driver_id:
+        abort(400, message="Both hospital_id and driver_id are required.")
+    
+    # Find the hospital and driver
+    hospital = HospitalModel.query.get(hospital_id)
+    driver = DriverModel.query.get(driver_id)
+    
+    if not hospital or not driver:
+        abort(404, message="Hospital or Driver not found.")
+    
+    # Check if they are connected
+    if driver not in hospital.drivers:
+        abort(400, message="No connection exists between the hospital and driver.")
+    
+    # Remove the relationship
+    hospital.drivers.remove(driver)
+    db.session.commit()
+    
+    return {"message": "Connection removed successfully."}
+

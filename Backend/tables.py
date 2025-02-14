@@ -97,6 +97,7 @@ class HospitalModel(db.Model):
     ambulances = db.relationship("AmbulanceModel", backref="hospital")
     drivers = db.relationship("DriverModel", secondary=hospital_driver_association, back_populates="hospitals")
     bookings = db.relationship("BookingModel", back_populates="hospital")
+    connection_requests = db.relationship("ConnectRequestModel", back_populates="hospital")
     
     def to_dict(self):
         return {
@@ -140,6 +141,7 @@ class DriverModel(db.Model):
     # Relationships
     hospitals = db.relationship("HospitalModel", secondary=hospital_driver_association, back_populates="drivers")
     bookings = db.relationship("BookingModel", back_populates="driver")
+    connection_requests = db.relationship("ConnectRequestModel", back_populates="driver")
     
     def to_dict(self):
         return {
@@ -241,4 +243,31 @@ class TokenBlocklist(db.Model):
     expires_at = db.Column(db.DateTime, nullable=False)
 
 
+class ConnectRequestModel(db.Model):
+    __tablename__ = "connect_requests"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.Enum("pending", "accepted", "rejected", name="request_status"), nullable=False, default="pending")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Request sender type: 'driver' or 'hospital'
+    sender_type = db.Column(db.Enum("driver", "hospital", name="sender_type"), nullable=False)
+
+    # Foreign keys
+    driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
+    hospital_id = db.Column(db.Integer, db.ForeignKey('hospital.id'), nullable=False)
+    
+    # Relationships with back_populates
+    driver = db.relationship("DriverModel", back_populates="connection_requests")
+    hospital = db.relationship("HospitalModel", back_populates="connection_requests")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "sender_type": self.sender_type,
+            "driver": self.driver.to_dict(),
+            "hospital": self.hospital.to_dict()
+        }
 

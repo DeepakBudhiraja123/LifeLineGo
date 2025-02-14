@@ -24,6 +24,13 @@ def is_driver_in_active_booking(driver_id):
     """Check if the driver is involved in any active booking."""
     return BookingModel.query.filter_by(driver_id=driver_id, status="active").first() is not None
 
+def connect_driver_with_hospital(driver_id, hospital_ids):
+    """Connect the driver with the hospital."""
+    driver = DriverModel.query.get(driver_id)
+    hospitals = [HospitalModel.query.get(hospital_id) for hospital_id in hospital_ids]
+    driver.hospitals.extend(hospitals)
+    
+
 
         
         

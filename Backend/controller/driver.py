@@ -11,7 +11,7 @@ from services.driver import *
 from services.logout import logout_logic
 from services.helper import *
 
-from tables import DriverModel
+from tables import DriverModel, ConnectRequestModel
 from schemas import DriverSchema, LoginSchema
 from db import db
 
@@ -91,5 +91,69 @@ class NearbyHospitals(MethodView):
     @jwt_required()
     def get(self):
       """Get hospitals within a 75 km range of the driver’s address."""
+      chck_driver_role()
       driver_id = get_jwt_identity()
-      return get_nearby_hospitals("driver", DriverModel, driver_id, radius_km=75)
+      result = get_nearby_items(driver_id, 'hospital' ,radius_km=75)
+      return {"hospitals": result, "status": 200, "message":"Hospitals fetched successfully"}, 200
+  
+  
+@blp.route("/api/drivers/connect-hospital/<int:hospital_id>")
+class connectToHospitals(MethodView):
+    @jwt_required()
+    def post(self, hospital_id):
+      """Connect to hospitals."""
+      check_driver_role()
+      driver_id = get_jwt_identity()
+      return send_connection_request("driver",driver_id, hospital_id)
+  
+
+@blp.route("/api/drivers/connection-requests")
+class ConnectionRequests(MethodView):
+    @jwt_required()
+    def get(self):
+      """Get connection requests."""
+      check_driver_role()
+      driver_id = get_jwt_identity()
+      return get_connection_requests(DriverModel, driver_id)
+  
+@blp.route("/api/drivers/respond-connection/<int:req_id>/<string:response>")
+class AcceptConnection(MethodView):
+    @jwt_required()
+    def post(self, req_id, response):
+        """Accept connection requests."""
+        check_driver_role()
+        driver_id = int(get_jwt_identity())
+        connection_request = ConnectRequestModel.query.get(req_id)
+        if not connection_request:
+            abort(404, message="Connection request not found.")
+        if connection_request.driver_id != driver_id:
+            abort(403, message="Access forbidden: Connection request not for this driver.")
+        if connection_request.sender_type != "hospital":
+            abort(403, message="Access forbidden: Connection request not from a hospital.")
+        return respond_to_connection_request(connection_request, response)
+
+
+@blp.route("/api/drivers/hospitals")
+class HospitalDrivers(MethodView):
+    @jwt_required()
+    def get(self):
+        """Get drivers associated with the hospital."""
+        check_driver_role()
+        driver_id = get_jwt_identity()
+        hospitals = DriverModel.query.get(driver_id).hospitals
+        if not hospitals:
+            return abort(404, message="No hospitals associated with the driver.")
+        hospitals = [hospital.to_dict() for hospital in hospitals]
+        
+        return {"hospitals":hospitals, "status": 200, "message":"Hospitals fetched successfully"}, 200
+    
+@blp.route("/api/drivers/remove-hospital/<int:hospital_id>")
+class RemoveHospital(MethodView):
+    @jwt_required()
+    def delete(self, hospital_id):
+        """Remove the hospital from the driver's associated hospitals."""
+        check_driver_role()
+        driver_id = get_jwt_identity()
+        return remove_connection( hospital_id, driver_id)
+
+     
