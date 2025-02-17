@@ -1,0 +1,92 @@
+.about {
+  width: 100vw;
+  height: 400vh;
+}
+.lifeline-content {
+  display: flex;
+  width: 100vw;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.lifeline-content .left {
+  width: 50vw;
+  height: 40vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+}
+.lifeline-content .left p {
+  line-height: 35px;
+  font-size: 20px;
+  font-weight: 400;
+}
+.lifeline-content .left h2 {
+  font-size: 35px;
+}
+.lifeline-content .left h2 span {
+  color: #0a74da;
+  border-bottom: 4px solid #0a74da;
+  padding: 6px 0px;
+}
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Apply Animation Classes */
+.slide-in-left {
+  animation: slideInLeft 1s ease-out forwards;
+}
+
+.slide-out-left {
+  animation: slideOutLeft 1s ease-out forwards;
+}
+
+.slide-in-right {
+  animation: slideInRight 1s ease-out forwards;
+}
+
+.slide-out-right {
+  animation: slideOutRight 1s ease-out forwards;
+}

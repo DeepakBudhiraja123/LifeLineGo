@@ -19,7 +19,7 @@ function App() {
       setTimeout(() => {
         setShowContent(true);
       }, 300);
-    }, 5000);
+    }, 1000);
   }, []);
 
   return (

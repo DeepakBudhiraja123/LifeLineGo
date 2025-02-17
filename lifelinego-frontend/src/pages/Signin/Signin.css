@@ -8,8 +8,20 @@
   justify-content: center;
   align-items: center;
   background-color: rgb(247, 244, 244);
+  flex-wrap: wrap;
+  padding: 20px;
+  animation: fadeSlideIn 0.5s ease-in-out forwards;
 }
-
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(250px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .auth-left,
 .auth-right {
   display: flex;
@@ -19,19 +31,25 @@
   width: 40vw;
   height: 70vh;
   background-color: white;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .auth-left img {
   height: auto;
-  width: 30vw;
+  width: 100%;
+  max-width: 30vw;
 }
 
 .auth-box {
   background: white;
-  width: 30vw;
+  width: 100%;
+  max-width: 30vw;
   text-align: center;
-  height: 35vh;
+  height: auto;
+  padding: 20px;
   transition: transform 0.5s ease-in-out;
+  box-sizing: border-box;
 }
 
 .auth-box h2 {
@@ -81,16 +99,71 @@
 
 .signin-mode .auth-left {
   transform: translateX(0);
+  transition: transform 1s ease-in-out;
 }
 
 .signin-mode .auth-right {
   transform: translateX(0);
+  transition: transform 1s ease-in-out;
 }
 
 .signup-mode .auth-left {
   transform: translateX(100%);
+  transition: transform 1s ease-in-out;
 }
 
 .signup-mode .auth-right {
   transform: translateX(-100%);
+  transition: transform 1s ease-in-out;
+}
+
+@media screen and (max-width: 1024px) {
+  .auth-left,
+  .auth-right {
+    width: 90%;
+    height: auto;
+  }
+
+  .auth-box {
+    max-width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .auth-left,
+  .auth-right {
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    transition: transform 1.5s ease-in-out;
+  }
+
+  .auth-left img {
+    max-width: 70%;
+  }
+
+  .auth-box {
+    max-width: 100%;
+    padding: 15px;
+  }
+
+  .auth-box h2 {
+    font-size: 28px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .auth-box h2 {
+    font-size: 24px;
+  }
+
+  .auth-box input,
+  .auth-box button {
+    width: 90%;
+  }
 }

@@ -1,6 +1,5 @@
 .navbar {
-  background-color: #0a74da;
-  color: white;
+  background-color: white;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -19,7 +18,7 @@
   font-size: 24px;
   font-weight: bold;
   text-decoration: none;
-  color: white;
+  color: #0a74da;
 }
 
 .nav-links {
@@ -35,17 +34,29 @@
 
 .nav-links li a {
   text-decoration: none;
-  color: white;
+  color: #0a74da;
   font-size: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: 0.3s ease;
+  position: relative;
+  transition: color 0.3s ease;
 }
 
-.nav-links li a:hover {
-  color: #ffdd57; 
-  transform: scale(1.05);
+.nav-links li a::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #0a74da;
+  transition: width 0.3s ease;
+}
+
+/* Black underline from left to right on hover */
+.nav-links li a:hover::after {
+  width: 100%;
 }
 
 .sign-btn {

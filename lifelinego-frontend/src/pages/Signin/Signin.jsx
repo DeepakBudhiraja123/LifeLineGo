@@ -14,7 +14,6 @@ const Signin = () => {
         />
       </div>
       
-      {/* Right Section */}
       <div className="auth-right">
         <div className="auth-box">
           <h2>{isSignUp ? "Create an Account" : "Welcome Back"}</h2>
