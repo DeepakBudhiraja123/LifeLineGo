@@ -3,10 +3,10 @@ from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from flask_jwt_extended import  jwt_required, get_jwt_identity, get_jwt
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from db import db
-from schemas import AdminSchema, LoginSchema
-from services.logout import logout_logic
-from services.helper import *
+from project.db import db
+from project.schemas import AdminSchema, LoginSchema
+from project.services.logout import logout_logic
+from project.services.helper import *
 
 blp = Blueprint("Admins", __name__, description="Operations on admins")
 

@@ -1,6 +1,7 @@
-from tables import  *
-from services.driver import is_driver_in_active_booking
-from db import db
+from project.tables import  *
+from project.services.driver import is_driver_in_active_booking
+from project.db import db
+
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token
@@ -12,6 +13,26 @@ from math import radians, sin, cos, sqrt, atan2
 
 # Business Logic Functions for CRUD operations
 
+
+
+# 
+def manage_address_field(data):
+    # Extract address data from hospital_data
+    address = data.pop("address")
+
+    # Create and save the address in the Address table
+    city_state = CityStateModel.query.filter_by(
+        postal_code=address["postal_code"]
+    ).first()
+    if not city_state:
+        city_state = CityStateModel(
+        city=address["city"],
+        state=address["state"],
+        postal_code=address["postal_code"]
+    )
+    field = {"city_state": city_state,"street": address["street"],"latitude":                               address["latitude"],"longitude": address["longitude"]}
+    return field
+
 # Create a new entry and generate tokens   
 def create_logic(data, Model, entity):
     """Business logic to create a new entry and generate tokens."""
@@ -20,20 +41,7 @@ def create_logic(data, Model, entity):
     
     if 'address' in data:
         # Extract address data from hospital_data
-        address = data.pop("address")
-    
-        # Create and save the address in the Address table
-        city_state = CityStateModel.query.filter_by(
-            postal_code=address["postal_code"]
-        ).first()
-
-        if not city_state:
-            city_state = CityStateModel(
-            city=address["city"],
-            state=address["state"],
-            postal_code=address["postal_code"]
-        )
-        field = {"city_state": city_state,"street": address["street"],"latitude": address["latitude"],"longitude": address["longitude"]}
+        field = manage_address_field(data)
     
     # Add the address_id to hospital_data and create the hospital
     if len(data["password"]) < 6:
@@ -332,10 +340,13 @@ def remove_connection(hospital_id=None, driver_id=None):
     # Check if they are connected
     if driver not in hospital.drivers:
         abort(400, message="No connection exists between the hospital and driver.")
+        
+    if is_driver_in_active_booking(driver_id):
+        abort(400, message="Driver is currently involved in an active booking.")
     
     # Remove the relationship
     hospital.drivers.remove(driver)
     db.session.commit()
     
-    return {"message": "Connection removed successfully."}
+    return {"message": "Connection removed successfully."},204
 

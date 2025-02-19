@@ -7,13 +7,13 @@ from flask_jwt_extended import (
 
 from passlib.hash import pbkdf2_sha256
 
-from services.driver import *
-from services.logout import logout_logic
-from services.helper import *
+from project.services.driver import *
+from project.services.logout import logout_logic
+from project.services.helper import *
 
-from tables import DriverModel, ConnectRequestModel
-from schemas import DriverSchema, LoginSchema
-from db import db
+from project.tables import DriverModel, ConnectRequestModel
+from project.schemas import DriverSchema, LoginSchema
+from project.db import db
 
 blp = Blueprint("Drivers", __name__, description="Operations on drivers")
 

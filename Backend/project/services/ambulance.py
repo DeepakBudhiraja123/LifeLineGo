@@ -1,9 +1,9 @@
-from tables import AmbulanceModel, BookingModel
-from db import db
+from project.tables import AmbulanceModel, BookingModel
+from project.db import db
+from project.services.driver import *
+
 from sqlalchemy.exc import SQLAlchemyError
 from flask_smorest import abort
-from services.driver import *
-
 
 def validate_ambulance_data(ambulance_data, hospital_id):
     """Validate ambulance data for hospital_id and driver_id."""

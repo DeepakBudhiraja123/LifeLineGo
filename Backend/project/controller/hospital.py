@@ -1,3 +1,4 @@
+from flask import request
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from flask_jwt_extended import (
@@ -9,11 +10,13 @@ from flask_jwt_extended import (
 )
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from passlib.hash import pbkdf2_sha256
-from tables import HospitalModel, ConnectRequestModel
-from db import db
-from schemas import HospitalSchema, LoginSchema
-from services.logout import logout_logic
-from services.helper import *
+
+from project.tables import HospitalModel, ConnectRequestModel
+from project.db import db
+from project.schemas import HospitalSchema, LoginSchema
+from project.services.logout import logout_logic
+from project.services.helper import *
+from project.services.ambulanceBooking import *
 
 blp = Blueprint("Hospitals", __name__, description="Operations on hospitals")
 
@@ -73,6 +76,39 @@ class AllUsers(MethodView):
         """Get all hospitals without any authentication."""
         return get_all_item_logic(HospitalModel, "hospitals")
 
+@blp.route("/api/hospitals/order-requests/all", methods=["GET"])
+@jwt_required()
+def find_order_requests():
+    """Retrieve order requests for the logged-in user"""
+    user_id = get_jwt_identity()
+    check_hospital_role()
+    return get_order_requests(user_id,"hospital")
+
+
+
+
+@blp.route("/api/hospitals/booking-response/<int:booking_id>", methods=["POST"])
+@jwt_required()
+def handle_respond_to_booking(booking_id):
+    """Step 1: Hospital responds with accepted/rejected."""
+    hospital_id = get_jwt_identity()
+    check_hospital_role()  # Ensure only hospitals can access this
+    data = request.get_json()
+    if not data:
+        abort(400, message="No input data provided.")
+    return respond_to_booking(data,booking_id,hospital_id)
+
+
+@blp.route("/api/hospitals/assign-booking-details/<int:booking_request_id>", methods=["POST"])
+@jwt_required()
+@blp.arguments(BookingSchema)
+def handle_assign_booking_details(data, booking_request_id):
+    """Step 2: Hospital assigns driver & ambulance details, generates OTP."""
+    hospital_id = get_jwt_identity()
+    check_hospital_role()  # Ensure only hospitals can access this
+
+    return assign_booking_details(data,booking_request_id,hospital_id)
+    
 
 @blp.route("/api/hospitals/login")
 class HospitalLogin(MethodView):

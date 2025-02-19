@@ -2,9 +2,11 @@ from datetime import datetime
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy.exc import IntegrityError
 from flask_smorest import abort
-from db import db
-from tables import *
-from schemas import DriverSchema, PlainAddressSchema
+
+from project.db import db
+from project.tables import *
+
+from project.schemas import DriverSchema, AddressSchema
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token

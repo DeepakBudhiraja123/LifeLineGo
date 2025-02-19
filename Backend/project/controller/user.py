@@ -1,15 +1,19 @@
 from urllib import response
+
 from flask import request
 from flask_smorest import Blueprint, abort
 from flask.views import MethodView
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required,get_jwt
+
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from passlib.hash import pbkdf2_sha256
-from tables import UserModel
-from db import db
-from schemas import UserSchema, LoginSchema
-from services.logout import logout_logic
-from services.helper import *
+
+from project.tables import UserModel
+from project.db import db
+from project.schemas import UserSchema, LoginSchema
+from project.services.logout import logout_logic
+from project.services.helper import *
+from project.services.ambulanceBooking import *
 
 blp = Blueprint("Users", __name__, description="Operations on users")
 
@@ -67,6 +71,26 @@ class AllUsers(MethodView):
     def get(self):
         """Get all users without any authentication."""
         return get_all_item_logic(UserModel, "user")
+
+@blp.route("/api/users/order-requests", methods=["POST"])
+@jwt_required()
+@blp.arguments(OrderRequestSchema)
+def handle_create_order_request(request_data):
+    """Create a new ambulance booking request"""
+    user_id = get_jwt_identity()  # Get logged-in user
+    check_user_role()  # Ensure only users can access this
+    return create_order_request(request_data,user_id)
+
+
+@blp.route("/api/users/order-requests/all", methods=["GET"])
+@jwt_required()
+def find_order_requests():
+    """Retrieve order requests for the logged-in user"""
+    user_id = get_jwt_identity()
+    check_user_role()
+
+    return get_order_requests(user_id,"user")
+
 
 
 

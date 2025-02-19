@@ -9,3 +9,6 @@ flask-jwt-extended
 pymysql
 apscheduler
 flask-restful
+Flask-Mail
+celery
+redis

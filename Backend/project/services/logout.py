@@ -1,7 +1,9 @@
-from tables import TokenBlocklist
-from datetime import datetime
+from project.tables import TokenBlocklist
+from project.db import db
+
 from datetime import timedelta
-from db import db
+from datetime import datetime
+
 
 def logout_logic(jti, expires_at):
   """Add token to the blocklist with its expiration time."""
