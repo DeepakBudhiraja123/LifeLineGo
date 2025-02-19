@@ -7,6 +7,10 @@ import hero3 from "./hero3.jpg";
 import hero from "./heroImage.gif";
 import background from "./background.jpg";
 import firstAid from "./firstAid.webp";
+import whyUs from "./whyUs.png"
+import Location from "./Location.png";
+import Staff from "./Staff.webp";
+import Emergency from "./Emergency.png";
 
 const images = {
     Loading,
@@ -17,7 +21,11 @@ const images = {
     hero3,
     hero,
     background,
-    firstAid
+    firstAid,
+    whyUs,
+    Location, 
+    Emergency, 
+    Staff
 }
 
 export default images;

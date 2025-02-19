@@ -59,7 +59,7 @@ const Hero = () => {
         className="background-overlay"
         style={{
           backgroundImage: backgroundImage ? `url(${backgroundImage})` : "none",
-          backgroundSize: "cover",
+          backgroundSize: "cover",  
           backgroundPosition: "center",
           transition: "opacity 0.5s ease-in-out",
           opacity: bgOpacity,
