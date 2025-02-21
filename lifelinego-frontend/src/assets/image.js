@@ -11,6 +11,7 @@ import whyUs from "./whyUs.png"
 import Location from "./Location.png";
 import Staff from "./Staff.webp";
 import Emergency from "./Emergency.png";
+import AmbulanceDispatch from "./AmbulanceDispatch.png";
 
 const images = {
     Loading,
@@ -25,7 +26,8 @@ const images = {
     whyUs,
     Location, 
     Emergency, 
-    Staff
+    Staff,
+    AmbulanceDispatch
 }
 
 export default images;
