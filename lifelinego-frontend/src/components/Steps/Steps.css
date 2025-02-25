@@ -1,0 +1,140 @@
+.how-it-works {
+  width: 100%;
+  height: 90vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 5vh 5vw;
+  flex-direction: column;
+  gap: 30px;
+  overflow: hidden;
+}
+
+.how-it-works .how-it-works-heading {
+  overflow: hidden;
+  width: 90vw;
+  padding-bottom: 50px;
+  border-bottom: 2px solid grey;
+}
+
+.how-it-works .how-it-works-heading span {
+  text-transform: uppercase;
+  color: #0a74da;
+  padding-right: 10px;
+}
+
+.how-it-works .how-it-works-heading h2 {
+  text-transform: uppercase;
+  width: 100%;
+  font-size: 50px;
+  transform: translateX(-600px);
+  transition: transform 2.5s ease-in-out;
+}
+
+.how-it-works .description-how-it-works {
+  width: 70vw;
+  padding-left: 20vw;
+  overflow: hidden;
+  height: 15vh;
+}
+
+.how-it-works .description-how-it-works p {
+  color: grey;
+  transform: translateY(300px);
+  transition: transform 2.5s ease-in-out;
+}
+
+.how-it-works-steps {
+  width: 90vw;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  /* margin-top: 5vh; */
+}
+
+.how-it-works .how-it-works-steps .how-it-work-step-closure {
+  width: 18vw;
+  height: 50vh;
+  overflow: hidden;
+  position: relative; /* Required for absolute positioning */
+}
+
+.how-it-works .how-it-works-steps .how-it-work-step-closure .how-it-work-step {
+  width: 18vw;
+  height: 50vh;
+  transform: translateX(-18vw);
+  transition: transform 1s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background-color: #acd5fb;
+  gap: 10vh;
+  cursor: pointer;
+}
+
+.how-it-works .how-it-works-heading .slide-in-left-how-it-works {
+  transform: translateX(0);
+}
+
+.how-it-works .description-how-it-works .slide-in-bottom-how-it-works {
+  transform: translateY(0);
+}
+
+.how-it-works
+  .how-it-works-steps
+  .how-it-work-step-closure
+  .slide-left-how-it-work {
+  transform: translateX(0);
+  border: 2px solid rgb(250, 250, 253);
+  border-radius: 30px;
+}
+
+.how-it-works
+  .how-it-works-steps
+  .how-it-work-step-closure
+  .how-it-work-step
+  .step-image {
+  width: 14vw;
+  height: 22vh;
+}
+
+.how-it-works
+  .how-it-works-steps
+  .how-it-work-step-closure
+  .how-it-work-step
+  .step-title {
+  color: rgb(4, 11, 46);
+  font-size: 25px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* ✅ Hover Effect for Description */
+.how-it-work-step-closure .how-it-work-step-desc {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  background: rgba(0, 0, 0);
+  color: #fff;
+  border-radius: 8px;
+  text-align: center;
+  height: 20vh;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.how-it-work-step-closure:hover .how-it-work-step-desc {
+  opacity: 1;
+  transform: translateY(0);
+}

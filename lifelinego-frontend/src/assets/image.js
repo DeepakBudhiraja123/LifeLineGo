@@ -12,6 +12,10 @@ import Location from "./Location.png";
 import Staff from "./Staff.webp";
 import Emergency from "./Emergency.png";
 import AmbulanceDispatch from "./AmbulanceDispatch.png";
+import TrackLocation from "./TrackLocation.jpeg";
+import EnterLocation from "./EnterLocation.png";
+import ChooseAmbulance from "./ChooseAmbulance.png";
+import confirmBooking from "./confirmBooking.webp";
 
 const images = {
     Loading,
@@ -27,7 +31,11 @@ const images = {
     Location, 
     Emergency, 
     Staff,
-    AmbulanceDispatch
+    AmbulanceDispatch,
+    TrackLocation,
+    EnterLocation,
+    ChooseAmbulance,
+    confirmBooking
 }
 
 export default images;

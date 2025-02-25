@@ -18,12 +18,6 @@ const WhyUs = () => {
 
   useEffect(() => {
     if (inView) {
-      setVisibleBlocks({
-        block1: false,
-        block2: false,
-        block3: false,
-        block4: false,
-      });
 
       setTimeout(
         () => setVisibleBlocks((prev) => ({ ...prev, block1: true })),
@@ -41,16 +35,6 @@ const WhyUs = () => {
         () => setVisibleBlocks((prev) => ({ ...prev, block4: true })),
         3200
       );
-    }
-  }, [inView]);
-  useEffect(() => {
-    if (!inView) {
-      setVisibleBlocks({
-        block1: false,
-        block2: false,
-        block3: false,
-        block4: false,
-      });
     }
   }, [inView]);
 
