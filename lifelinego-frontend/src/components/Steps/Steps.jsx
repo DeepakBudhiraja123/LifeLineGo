@@ -8,30 +8,37 @@ const steps = [
     icon: images.EnterLocation,
     title: "Enter Location",
     description:
-      "Provide your pickup location for quick access. This ensures the nearest available ambulance can reach you without delays, reducing response time during critical emergencies.",
+      "Provide your pickup location to ensure the nearest ambulance reaches you quickly, reducing response time in emergencies.",
   },
   {
     icon: images.ChooseAmbulance,
     title: "Choose Ambulance",
     description:
-      "Select the type of ambulance service you need based on the emergency. Whether it's a basic life support ambulance, an advanced ICU-equipped vehicle, or a neonatal care unit, choose the right option for the best care.",
+      "Select the right ambulance based on your needs—basic, ICU-equipped, or neonatal care—for the best medical support.",
   },
   {
     icon: images.confirmBooking,
     title: "Confirm Booking",
     description:
-      "Review all the details before confirming your ambulance request. Ensure accuracy in pickup location, ambulance type, and estimated arrival time to avoid any last-minute confusion.",
+      "Review and confirm your request, ensuring accurate details for a smooth and timely ambulance service.",
   },
   {
     icon: images.TrackLocation,
     title: "Track Ambulance",
     description:
-      "Monitor your ambulance in real-time on the map. Stay updated on its estimated arrival time, route, and driver details for a seamless and stress-free emergency response.",
+      "Monitor your ambulance in real-time, track its arrival, and get driver details for a stress-free experience.",
   },
 ];
 
+
 export default function Steps() {
   const [visible, setVisible] = useState(false);
+  const [pointerClass, setPointerClass] = useState({
+    block1: false,
+    block2: false,
+    block3: false,
+    block4: false,
+  });
   const [ref, inView] = useInView({
     threshold: 0.4,
   });
@@ -52,18 +59,22 @@ export default function Steps() {
     if (inView) {
       setTimeout(
         () => setVisibleBlocks((prev) => ({ ...prev, block1: true })),
+        () => setPointerClass((prev) => ({ ...prev, block1: true })),
         1500
       );
       setTimeout(
         () => setVisibleBlocks((prev) => ({ ...prev, block2: true })),
+        () => setPointerClass((prev) => ({ ...prev, block2: true })),
         3000
       );
       setTimeout(
         () => setVisibleBlocks((prev) => ({ ...prev, block3: true })),
+        () => setPointerClass((prev) => ({ ...prev, block3: true })),
         4500
       );
       setTimeout(
         () => setVisibleBlocks((prev) => ({ ...prev, block4: true })),
+        () => setPointerClass((prev) => ({ ...prev, block4: true })),
         6000
       );
     }
@@ -71,6 +82,8 @@ export default function Steps() {
 
   return (
     <section className="how-it-works" ref={ref}>
+      <div className="absoluteBlue1"></div>
+      <div className="absoluteBlue2"></div>
       <div className="how-it-works-heading">
         <h2 className={`${visible ? "slide-in-left-how-it-works" : ""}`}>
           <span>/</span>How Can
@@ -89,7 +102,16 @@ export default function Steps() {
       </div>
       <div className="how-it-works-steps">
         {steps.map((step, index) => (
-          <div key={index} className="how-it-work-step-closure">
+          <div key={index} className={`how-it-work-step-closure ${
+            pointerClass[`block${index + 1}`]
+              ? ""
+              : "cursor-inactive"
+          }`}>
+            <p className={`${
+                visibleBlocks[`block${index + 1}`]
+                  ? "slide-left-how-it-work"
+                  : ""
+              }`}>0{index+1}</p>
             <div
               className={`how-it-work-step ${
                 visibleBlocks[`block${index + 1}`]
