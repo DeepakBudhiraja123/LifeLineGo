@@ -4,7 +4,6 @@ import WhyUs from "../../components/whyus/whyus"
 import "./Home.css"
 import Steps from '../../components/Steps/Steps'
 import Testimonials from '../../components/Testimonials/Testimonials'
-import Footer from '../../components/Footer/Footer'
 
 const Home = () => {
   return (
@@ -13,7 +12,6 @@ const Home = () => {
       <WhyUs />
       <Steps/>
       <Testimonials/>
-      <Footer/>
     </div>
   )
 }

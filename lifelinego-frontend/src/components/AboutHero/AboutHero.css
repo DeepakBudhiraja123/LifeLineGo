@@ -1,0 +1,46 @@
+.AboutHero {
+  width: 90vw;
+  height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 50px;
+  padding: 5vh 5vw;
+  color: black;
+  overflow: hidden;
+  transform: translateX(-100%);
+  transition: transform 1s ease-in-out; /* Smooth slide */
+  background-size: cover;
+  text-align: right;
+  margin-bottom: 10vh;
+}
+.slide-in-background-about-hero {
+  transform: translateX(0); /* Slide into view */
+}
+
+.AboutHero .AboutPara {
+  width: 50vw;
+  display: flex;
+  flex-direction: column;
+  gap: 70px;
+  opacity: 0; /* Start hidden */
+  transition: opacity 3s ease-in-out; /* Smooth fade in/out */
+}
+.AboutHero .AboutPara h3{
+    font-weight: 600;
+    font-size: 40px;
+}
+.AboutHero .AboutPara p {
+  font-weight: 400;
+  color: black;
+  opacity: 0.8;
+  font-size: 20px;
+}
+
+.AboutHero .AboutPara-fade-in {
+  opacity: 1; /* Show when visible */
+}
+
+.AboutHero .AboutPara-fade-out {
+  opacity: 0; /* Hide when out of view */
+}
