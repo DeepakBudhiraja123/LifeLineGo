@@ -1,11 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Testimonials.css";
 import images from "../../assets/image";
 import { RiDoubleQuotesR } from "react-icons/ri";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { useInView } from "react-intersection-observer";
 
 const Testimonials = () => {
+  const [visible1, setVisible1] = useState(false);
+  const [visible2, setVisible2] = useState(false);
+  const [visible3, setVisible3] = useState(false);
+  const [visible4, setVisible4] = useState(false);
+  const [visible5, setVisible5] = useState(false);
+
+  const [ref, inView] = useInView({
+    threshold: 0.4,
+  });
   const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(false);
   const testimonials = [
@@ -42,43 +52,57 @@ const Testimonials = () => {
       image: images.Testimonials4,
     },
   ];
+  useEffect(() => {
+    if (inView) {
+      setVisible1(true);
+      setTimeout(() => {
+        setVisible2(true);
+        setTimeout(() => {
+          setVisible3(true);
+          setTimeout(() => {
+            setVisible4(true);
+            setTimeout(() => {
+              setVisible5(true);
+            }, 2000);
+          }, 2000);
+        }, 2000);
+      }, 2000);
+    }
+  }, [inView]);
+
   const handleLeft = () => {
     if (index > 0) {
-      setFade(true); // Trigger fade out
-      setTimeout(() => {
-        setIndex((prevIndex) => prevIndex - 1); // Change the index
-        setTimeout(() => {
-          setFade(false); // Trigger fade in after new content loads
-        }, 300); // Adjust timing for a smoother transition
-      }, 300); // Delay for the fade-out effect
+      setIndex((prevIndex) => prevIndex - 1);
     }
   };
 
   const handleRight = () => {
     if (index < testimonials.length - 1) {
-      setFade(true); // Trigger fade out
-      setTimeout(() => {
-        setIndex((prevIndex) => prevIndex + 1); // Change the index
-        setTimeout(() => {
-          setFade(false); // Trigger fade in after new content loads
-        }, 300); // Adjust timing for a smoother transition
-      }, 300); // Delay for the fade-out effect
+      setIndex((prevIndex) => prevIndex + 1);
     }
   };
   return (
-    <div className="testimonials-container">
+    <div className="testimonials-container" ref={ref}>
       <div className="absoluteTestimonials"></div>
-      <div className={`testimonials-body ${fade ? "fade-body" : ""}`}>
-        <h2>
+      <div className={`testimonials-body`}>
+        <h2 className={visible1 ? "slide-in-left-testimonial" : ""}>
           What Our Customers <br /> Are Saying
         </h2>
         <div className="testimonials-body-flex">
           <div className="left-testimonials-body">
-            <div className="review-icon">
+            <div
+              className={`review-icon  ${
+                visible2 ? "appear-image-testimonial" : ""
+              }`}
+            >
               <RiDoubleQuotesR />
             </div>
-            <img src={testimonials[index].image} alt="" />
-            <div className="options-review">
+            <img
+              className={visible2 ? "appear-image-testimonial" : ""}
+              src={testimonials[index].image}
+              alt=""
+            />
+            <div className={`options-review`}>
               <div
                 className={`arrow-left ${index == 0 ? "disabled-class" : ""}`}
                 onClick={handleLeft}
@@ -94,9 +118,15 @@ const Testimonials = () => {
             </div>
           </div>
           <div className="right-testimonials-body">
-            <h6>{testimonials[index].heading}</h6>
-            <p>{testimonials[index].testimonial}</p>
-            <div className="publisher">
+            <h6 className={visible3 ? "slide-in-left-title" : ""}>
+              {testimonials[index].heading}
+            </h6>
+            <p className={visible4 ? "slide-in-left-title" : ""}>
+              {testimonials[index].testimonial}
+            </p>
+            <div
+              className={`publisher ${visible5 ? "slide-in-left-title" : ""}`}
+            >
               <h3>{testimonials[index].name}</h3>
               <h4>{testimonials[index].role}</h4>
             </div>

@@ -21,6 +21,11 @@ import Testimonials2 from "./Testimonials2.jpg";
 import Testimonials3 from "./Testimonials3.png";
 import Testimonials4 from "./Testimonials4.png";
 import aboutUs from "./aboutUs.png";
+import ServicesDoctor from "./ServicesDoctor.png";
+import ICUService from "./ICUService.png";
+import nonEmergency from "./nonEmergency.webp";
+import AirAmbulance from "./AirAmbulance.png";
+import ourVision from "./OurVision.jpg";
 
 const images = {
   Loading,
@@ -45,7 +50,12 @@ const images = {
   Testimonials2,
   Testimonials3,
   Testimonials4,
-  aboutUs
+  aboutUs,
+  ServicesDoctor,
+  ICUService,
+  AirAmbulance,
+  nonEmergency,
+  ourVision
 };
 
 export default images;

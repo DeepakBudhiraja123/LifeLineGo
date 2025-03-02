@@ -1,0 +1,29 @@
+.service-item{
+    display: flex;
+    flex-direction: column;
+    width: 20vw;
+    height: 30vh;
+    gap:20px;
+}
+.service-item .up{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+}
+.service-item .up img{
+    width: 5vw;
+    height: 8vh;
+}
+.service-item .up h4{
+    font-size: 25px;
+    color: black;
+    
+}
+.service-item p{
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 30px;
+    color: grey;
+    padding-left: 25px;
+}
