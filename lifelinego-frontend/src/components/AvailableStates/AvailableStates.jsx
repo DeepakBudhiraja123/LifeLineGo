@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./AvailableStates.css";
 
 const AvailableStates = () => {
@@ -22,7 +22,7 @@ const AvailableStates = () => {
   ];
 
   const stateMaps = {
-    default: "/Default.png",  // Default map with all states in blue
+    default: "/Default.png",
     maharashtra: "/Maharashtra.png",
     delhi: "/Delhi.png",
     karnataka: "/Karnataka.png",
@@ -38,6 +38,14 @@ const AvailableStates = () => {
     assam: "/Assam.png",
     kerala: "/Kerala.png",
   };
+
+  // 💡 Preload all images once
+  useEffect(() => {
+    Object.values(stateMaps).forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
 
   return (
     <div className="available-states-container">
@@ -59,13 +67,19 @@ const AvailableStates = () => {
       </div>
 
       <div className="states-map">
+        {/* Default Map Layer */}
         <div
-          className="india-map"
+          className="india-map default"
           style={{
-            backgroundImage: `url(${hoveredState ? stateMaps[hoveredState] : stateMaps.default})`,
-            backgroundSize: "cover",
-            height: "600px", // Adjust map size
-            opacity: hoveredState ? 1 : 1, // Fade out default map when a state is hovered
+            backgroundImage: `url(${stateMaps.default})`,
+          }}
+        ></div>
+
+        {/* Hovered State Map Layer */}
+        <div
+          className={`india-map hovered ${hoveredState ? "show" : ""}`}
+          style={{
+            backgroundImage: hoveredState ? `url(${stateMaps[hoveredState]})` : "none",
           }}
         ></div>
       </div>

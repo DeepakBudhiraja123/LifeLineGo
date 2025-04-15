@@ -28,6 +28,9 @@ import AirAmbulance from "./AirAmbulance.png";
 import ourVision from "./OurVision.jpg";
 import BookAmbulance from "./BookAmbulance.avif";
 import Map from "./Map.png";
+import BLS from "./BLS.jpeg";
+import ALS from "./ALS.jpeg"
+import Neonatal from "./Neonatal.jpg";
 
 const images = {
   Loading,
@@ -59,7 +62,10 @@ const images = {
   nonEmergency,
   ourVision,
   BookAmbulance,
-  Map
+  Map,
+  BLS,
+  ALS,
+  Neonatal
 };
 
 export default images;
