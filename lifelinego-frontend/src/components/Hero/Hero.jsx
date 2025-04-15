@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "./Hero.css";
 import images from "../../assets/image";
+import {useNavigate} from "react-router-dom"; 
 
 const words = ["HEALTH", "SAFETY", "FUTURE"];
 
 const Hero = () => {
+  
+  const navigate = useNavigate();
+
   const [wordIndex, setWordIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -52,6 +56,9 @@ const Hero = () => {
     setBgOpacity(0); // Fade out effect
   };
 
+  const handleOnClick = ()=>{
+    navigate("/book-ambulance")
+  }
   return (
     <div className="hero-container">
       {/* Background Overlay with Smooth Transition */}
@@ -77,7 +84,7 @@ const Hero = () => {
             reliable ambulance services, connecting you to life-saving care with
             just a tap—quick, efficient, and always ready.
           </p>
-          <button className="left-home-btn">
+          <button className="left-home-btn" onClick={handleOnClick}>
             <svg>
               <rect x="0" y="0" fill="none" width="100%" height="100%" />
             </svg>

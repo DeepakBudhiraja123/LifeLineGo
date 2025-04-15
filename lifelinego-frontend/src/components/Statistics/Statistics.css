@@ -1,0 +1,46 @@
+.coverage-performance {
+  width: 80%;
+  margin: 50px auto;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 28px;
+  color: #007bff;
+  margin-bottom: 40px;
+}
+
+.stat-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 60px;
+  gap: 80px;
+}
+
+
+.stat-text {
+  flex: 1;
+  text-align: left;
+}
+.left-align{
+    gap: 120px;
+}
+.stat-text h3 {
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.stat-text p {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.stat-chart {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

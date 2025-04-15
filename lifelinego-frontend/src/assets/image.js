@@ -26,6 +26,8 @@ import ICUService from "./ICUService.png";
 import nonEmergency from "./nonEmergency.webp";
 import AirAmbulance from "./AirAmbulance.png";
 import ourVision from "./OurVision.jpg";
+import BookAmbulance from "./BookAmbulance.avif";
+import Map from "./Map.png";
 
 const images = {
   Loading,
@@ -55,7 +57,9 @@ const images = {
   ICUService,
   AirAmbulance,
   nonEmergency,
-  ourVision
+  ourVision,
+  BookAmbulance,
+  Map
 };
 
 export default images;

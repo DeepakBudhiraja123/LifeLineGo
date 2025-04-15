@@ -1,0 +1,73 @@
+.available-states-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50px 50px;
+  background-color: #f8fcff;
+  gap: 50px;
+  margin-block: 5vh;
+}
+
+.states-list {
+  flex: 1;
+}
+
+.states-list h2 {
+  font-size: 32px;
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.states-list p {
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.states-list ul {
+  list-style: none;
+  padding: 0;
+  background-color: white;
+  width: 800px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  flex-wrap: wrap;
+  padding: 30px 30px;
+  /* justify-content: center; */
+}
+
+.states-list li {
+  color: #e9ecee;
+  width: 200px;
+  /* margin: 0px 40px; */
+  border-radius: 5px;
+  padding: 10px;
+  transition: background 0.3s;
+  color: black;
+}
+
+.states-list li:hover {
+  background-color: #0056b3;
+  color: white;
+}
+
+.states-map {
+  display: flex;
+  flex: 1;
+  justify-self: center;
+}
+
+.states-map .india-map {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  opacity: 1; /* Set opacity for default map */
+  transition: opacity 2s ease-in-out; /* Smooth transition for opacity */
+}
+
+.states-map .india-map.show {
+  opacity: 1; /* When hovered, opacity remains 1 */
+}

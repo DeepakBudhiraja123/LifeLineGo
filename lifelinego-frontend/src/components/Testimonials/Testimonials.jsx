@@ -63,10 +63,10 @@ const Testimonials = () => {
             setVisible4(true);
             setTimeout(() => {
               setVisible5(true);
-            }, 2000);
-          }, 2000);
-        }, 2000);
-      }, 2000);
+            }, 1000);
+          }, 800);
+        }, 600);
+      }, 400);
     }
   }, [inView]);
 

@@ -1,0 +1,126 @@
+.ambulance-container {
+  width: 70%;
+  max-width: 600px;
+  margin: 40px 0 40px 8%;   /* shifted towards left */
+  padding: 30px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #ffffff, #f0f7ff);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ambulance-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #007bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+  background: #eef2f7;
+  padding: 14px;
+  border-radius: 10px;
+  margin: 15px 0;
+  transition: box-shadow 0.3s ease;
+}
+
+.input-group:focus-within {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.icon {
+  font-size: 20px;
+  color: #007bff;
+  flex-shrink: 0;
+}
+
+input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+}
+
+.dropdown-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin: 15px 0;
+}
+
+.dropdown-group label {
+  margin-bottom: 6px;
+  color: #333;
+  font-size: 15px;
+}
+
+.dropdown {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.dropdown:focus {
+  border-color: #007bff;
+}
+
+.book-btn {
+  width: 100%;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 17px;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.book-btn:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+  font-size: 14px;
+}
+
+.arrival-info {
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.emergency-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.3s ease;
+}
+
+.emergency-btn:hover {
+  background: #a71d2a;
+}

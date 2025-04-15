@@ -3,7 +3,7 @@ import Hero from "../../components/Hero/Hero"
 import WhyUs from "../../components/whyus/whyus"
 import "./Home.css"
 import Steps from '../../components/Steps/Steps'
-import Testimonials from '../../components/Testimonials/Testimonials'
+import AvailableStates from '../../components/AvailableStates/AvailableStates'
 
 const Home = () => {
   return (
@@ -11,7 +11,7 @@ const Home = () => {
       <Hero/>
       <WhyUs />
       <Steps/>
-      <Testimonials/>
+      <AvailableStates/>
     </div>
   )
 }
