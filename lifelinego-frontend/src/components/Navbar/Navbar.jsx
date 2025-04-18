@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Home, PhoneCall, Info, Ambulance } from "lucide-react";
 import "./Navbar.css";
-
-const Navbar = () => {
+const Navbar = ({openCallModal}) => {
   const [isOpen, setIsOpen] = useState(false);
-
   return (
+    <>
     <nav className="navbar">
       <div className="nav-container">
         <button className="nav-toggle" onClick={() => setIsOpen(!isOpen)}>
@@ -33,7 +32,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/contact" onClick={() => setIsOpen(false)}>
+            <Link onClick={openCallModal} style={{ cursor: 'pointer', color: '#007bff' }}>
               <PhoneCall size={18} /> Call-us
             </Link>
           </li>
@@ -44,6 +43,8 @@ const Navbar = () => {
         </Link>
       </div>
     </nav>
+    
+    </>
   );
 };
 

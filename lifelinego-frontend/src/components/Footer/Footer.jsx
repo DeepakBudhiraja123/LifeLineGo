@@ -2,13 +2,8 @@ import React from "react";
 import "./Footer.css";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 
-const Footer = () => {
-  const navigate = useNavigate();
-    const handleNavigate = () => {
-    navigate("/contact"); // Contact page par navigate karega
-  };
+const Footer = ({ openCallModal }) => {
   return (
     <footer className="footer-container">
       <div className="footer-1">
@@ -17,9 +12,14 @@ const Footer = () => {
           ENOUGH?&#8594;
         </h4>
         <h1>Contact us</h1>
-        <div onClick={handleNavigate}>
+        <button 
+          onClick={() => {
+            console.log("Call Emergency button clicked");
+            openCallModal(); // This should open the modal
+          }}
+        >
           <FaArrowRight className="arrow" />
-        </div>
+        </button>
       </div>
       <div className="footer-2">
         <div className="footerBlock footerBlock1">
@@ -53,15 +53,28 @@ const Footer = () => {
           </p>
         </div>
         <div className="footerBlock footerBlock4">
-            <p>Need instant medical updates? Stay prepared with us!</p>
-            <p> <span>SIGN UP FOR FREE <FaArrowRight/></span></p>
-            <p>FOLLOW US</p>
-            <ul>
-                <li><FaFacebook/></li>
-                <li><FaTwitter/></li>
-                <li><FaLinkedin/></li>
-                <li><FaInstagram/></li>
-            </ul>
+          <p>Need instant medical updates? Stay prepared with us!</p>
+          <p>
+            {" "}
+            <span>
+              SIGN UP FOR FREE <FaArrowRight />
+            </span>
+          </p>
+          <p>FOLLOW US</p>
+          <ul>
+            <li>
+              <FaFacebook />
+            </li>
+            <li>
+              <FaTwitter />
+            </li>
+            <li>
+              <FaLinkedin />
+            </li>
+            <li>
+              <FaInstagram />
+            </li>
+          </ul>
         </div>
       </div>
     </footer>

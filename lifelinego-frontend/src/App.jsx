@@ -11,10 +11,12 @@ import Signin from "./pages/Signin/Signin";
 import Footer from "./components/Footer/Footer";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import BookAmbulance from "./pages/BookAmbulance/BookAmbulance";
+import ContactPopUp from "./components/ContactPopUp/ContactPopUp";
 
 function App() {
   const [loading, setLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);
+  const [isCallModalOpen, setIsCallModalOpen] = useState(false); // Modal state
 
   useEffect(() => {
     setTimeout(() => {
@@ -25,6 +27,12 @@ function App() {
     }, 1000);
   }, []);
 
+  // Open modal function
+  const openCallModal = () => setIsCallModalOpen(true);
+
+  // Close modal function
+  const closeCallModal = () => setIsCallModalOpen(false);
+
   return (
     <>
       {loading ? (
@@ -32,17 +40,21 @@ function App() {
       ) : (
         <div className={`app-content ${showContent ? "fade-in" : ""}`}>
           <Router>
-            <ScrollToTop/>
-            <Navbar />
+            <ScrollToTop />
+            <Navbar openCallModal={openCallModal} />
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/book-ambulance" element={<BookAmbulance/>}/>
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/signin" element={<Signin/>}/>
+              <Route path="/" element={<Home onCallClick={openCallModal} />} />
+              <Route
+                path="/book-ambulance"
+                element={<BookAmbulance openCallModal={openCallModal} />}
+              />
+              <Route path="/about" element={<About onCallClick={openCallModal} />} />
+              <Route path="/signin" element={<Signin onCallClick={openCallModal} />} />
             </Routes>
-            <Footer/>
+            <Footer openCallModal={openCallModal}/>
           </Router>
+          {/* Modal for calling */}
+          <ContactPopUp isOpen={isCallModalOpen} onClose={closeCallModal} />
         </div>
       )}
     </>

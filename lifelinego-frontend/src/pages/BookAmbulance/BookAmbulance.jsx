@@ -4,10 +4,10 @@ import AvailableStates from '../../components/AvailableStates/AvailableStates'
 import Statistics from '../../components/Statistics/Statistics'
 import AmbulanceTypes from '../../components/AmbulanceTypes/AmbulanceTypes'
 
-const BookAmbulance = () => {
+const BookAmbulance = ({openCallModal}) => {
   return (
     <div>
-      <AmbulanceForm/>
+      <AmbulanceForm openCallModal= {openCallModal}/>
       <AmbulanceTypes/>
       <AvailableStates/>
       <Statistics/>
